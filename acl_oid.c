@@ -63,8 +63,6 @@ static void format_who(StringInfo out, intptr_t opaque);
 static AclEntryBase *extract_acl_entry_base(void *entry);
 static bool who_matches(void *entry, intptr_t who);
 
-static Oid get_role_oid(const char *name, bool missing_ok);
-
 Datum
 ace_in(PG_FUNCTION_ARGS)
 {
@@ -384,18 +382,4 @@ who_matches(void *entry, intptr_t who)
 	Oid			entry_who = ((AclEntryOid *) entry)->who;
 
 	return entry_who == PUBLIC_OID || entry_who == (Oid) who;
-}
-
-static
-Oid get_role_oid(const char *name, bool missing_ok)
-{
-	Oid			oid;
-
-	oid = GetSysCacheOid1(AUTHNAME, CStringGetDatum(name));
-	if (!missing_ok && !OidIsValid(oid))
-		ereport(ERROR,
-				(errcode(ERRCODE_UNDEFINED_OBJECT),
-				 errmsg("role \"%s\" does not exist", name)));
-
-	return oid;
 }
